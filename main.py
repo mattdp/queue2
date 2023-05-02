@@ -1,5 +1,7 @@
 import sqlite3
 
+#underlying assumption: table called QUEUE
+
 connection = sqlite3.connect('first.db')
 
 connection.execute("DROP TABLE QUEUE")
@@ -24,8 +26,13 @@ queue = [(1,"remove spanner"),(5,"reticulate splines"),(8,"polish vortices")]
 def main():
     add_tuple((89,"sample addition"))
     process_tuple()
+    wipe_table(connection,"QUEUE")
     print(queue)
     return 0
+
+# deliberately delete all entries from table
+def wipe_table(connection,table_name):
+    connection.execute(f"DELETE FROM {table_name}")
 
 def add_tuple(change):
     queue.append(change)
