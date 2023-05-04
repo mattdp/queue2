@@ -13,8 +13,13 @@ def main():
     table_name = "QUEUE"
 
     wipe_table(connection,table_name)
-    #FIX: underlying assumption: table called QUEUE
-    connection.execute("INSERT INTO QUEUE (CRM_ID,PAYLOAD,NEXT_ID) VALUES (8,'The first insertion',NULL)")
+    update_list = [
+        (8,"post-call follow up",False),
+        (9,"see if new VP is interested",8),
+        (12,"wait 6 months",9),
+        (5,"send a quote",False)
+    ]
+    inserts(update_list,connection,table_name)
     print_table(connection,table_name)
 
     return 0
@@ -38,7 +43,7 @@ def wipe_table(connection,table_name):
     connection.execute(f"DELETE FROM {table_name}")
 
 def print_table(connection,table_name):
-    cursor = connection.execute("SELECT * FROM QUEUE")
+    cursor = connection.execute(f"SELECT * FROM {table_name}")
     for row in cursor:
         print_row(row)
 
@@ -49,6 +54,14 @@ def print_row(row):
 def add_tuple(queue,change):
     queue.append(change)
     return 0
+
+def inserts(update_list,connection,table_name):
+
+    for entry in update_list:
+        #quotes manually added since middle input a string - there must be be a better way
+        #putting in FALSE instead of null seems like a possible future problem, but does seem to revert to 0
+        sql = f"INSERT INTO {table_name} (CRM_ID,PAYLOAD,NEXT_ID) VALUES ({entry[0]},'{entry[1]}',{entry[2]})"
+        connection.execute(sql)
 
 def process_tuple(queue):
     return queue.pop(0)
